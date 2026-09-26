@@ -55,6 +55,11 @@ Independently estimate the propability that this event occurs.
                 "content": user_prompt
             }
         ],
+        tools=[
+            {
+                "type": "web_search"
+            }
+        ],
         text_format = Forecast
     )
 
