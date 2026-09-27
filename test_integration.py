@@ -10,10 +10,6 @@ from agent.agent import (
 )
 
 
-
-
-
-
 print(
     "Fetching Manifold markets..."
 )

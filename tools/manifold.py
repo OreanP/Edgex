@@ -1,27 +1,34 @@
-import requests
-from agent.schemas import Market
-
 import os
+import time
 
+import requests
 from dotenv import load_dotenv
+
+from agent.schemas import Market
 
 
 load_dotenv()
 
-BASE_URL = "https://api.manifold.markets/v0"
 
+BASE_URL = "https://api.manifold.markets/v0"
 API_KEY = os.getenv("MANIFOLD_API_KEY")
 
-BASE_URL="https://api.manifold.markets/v0"
 
 def get_headers():
+    if not API_KEY:
+        raise RuntimeError(
+            "MANIFOLD_API_KEY is missing."
+        )
+
     return {
         "Authorization": f"Key {API_KEY}"
     }
 
-def get_markets(limit=5, topic="ai"):
-    
-    
+
+def get_markets(
+    limit=5,
+    topic="ai"
+):
     params = {
         "filter": "open",
         "contractType": "BINARY",
@@ -32,79 +39,159 @@ def get_markets(limit=5, topic="ai"):
 
     response = requests.get(
         f"{BASE_URL}/search-markets",
-        params=params
+        params=params,
+        timeout=10
     )
 
     response.raise_for_status()
 
     return response.json()
 
-def get_market(market_id):
+
+def get_market(
+    market_id: str
+):
     response = requests.get(
-        f"{BASE_URL}/market/{market_id}"
+        f"{BASE_URL}/market/{market_id}",
+        timeout=10
     )
 
     response.raise_for_status()
 
     return response.json()
 
-def scout_markets(markets, min_volume_24h=50):
+
+def scout_markets(
+    markets,
+    min_volume_24h=50
+):
     candidates = []
 
     for market in markets:
-        probability = market.get("probability")
-        volume_24h = market.get("volume24Hours", 0)
 
-        # Une probabilité est indispensable pour A
+        probability = market.get(
+            "probability"
+        )
+
+        volume_24h = market.get(
+            "volume24Hours",
+            0
+        )
+
+        # Probability required by agent A
         if probability is None:
             continue
 
-        # Sécurité : uniquement marchés binaires
-        if market.get("outcomeType") != "BINARY":
+        # Binary markets only
+        if market.get(
+            "outcomeType"
+        ) != "BINARY":
             continue
 
-        # Sécurité : pas de marché déjà résolu
-        if market.get("isResolved", False):
+        # Open markets only
+        if market.get(
+            "isResolved",
+            False
+        ):
             continue
 
-        # Élimine les marchés sans activité récente suffisante
+        # Require recent activity
         if volume_24h < min_volume_24h:
             continue
 
-        candidates.append(market)
+        # Mana only
+        if market.get(
+            "token",
+            "MANA"
+        ) != "MANA":
+            continue
+
+        candidates.append(
+            market
+        )
 
     return candidates
 
 
-markets = get_markets(
-    limit=50,
-    topic="ai"
-)
-
-def to_market(manifold_market):
+def to_market(
+    manifold_market
+):
     return Market(
-        id=manifold_market.get("id"),
-        question=manifold_market.get("question"),
-        probability=manifold_market.get("probability"),
-        description=manifold_market.get("description")
+        id=manifold_market["id"],
+
+        question=(
+            manifold_market["question"]
+        ),
+
+        probability=(
+            manifold_market["probability"]
+        ),
+
+        description=(
+            manifold_market.get(
+                "description"
+            )
+        ),
+
+        url=(
+            manifold_market.get(
+                "url"
+            )
+        ),
+
+        volume=(
+            manifold_market.get(
+                "volume24Hours"
+            )
+        ),
+
+        close_time=(
+            manifold_market.get(
+                "closeTime"
+            )
+        ),
+
+        fetched_at=time.time(),
+
+        token=(
+            manifold_market.get(
+                "token",
+                "MANA"
+            )
+        )
     )
+
 
 def get_me():
     response = requests.get(
         f"{BASE_URL}/me",
-        headers=get_headers()
+        headers=get_headers(),
+        timeout=10
     )
 
     response.raise_for_status()
 
     return response.json()
 
-def place_bet(market_id, outcome, amount, dry_run=True):
-    if outcome not in ("YES", "NO"):
-        raise ValueError("outcome doit être 'YES' ou 'NO'")
+
+def place_bet(
+    market_id: str,
+    outcome: str,
+    amount: float,
+    dry_run=True
+):
+    if outcome not in (
+        "YES",
+        "NO"
+    ):
+        raise ValueError(
+            "outcome doit être YES ou NO"
+        )
 
     if amount <= 0:
-        raise ValueError("amount doit être supérieur à 0")
+        raise ValueError(
+            "amount doit être supérieur à 0"
+        )
 
     payload = {
         "amount": amount,
@@ -116,19 +203,10 @@ def place_bet(market_id, outcome, amount, dry_run=True):
     response = requests.post(
         f"{BASE_URL}/bet",
         headers=get_headers(),
-        json=payload
+        json=payload,
+        timeout=10
     )
 
     response.raise_for_status()
 
     return response.json()
-
-result = place_bet(
-    market_id="A319ydGB1B7f4PMOROL3",
-    outcome="YES",
-    amount=1,
-    dry_run=True
-)
-
-print(result)
-

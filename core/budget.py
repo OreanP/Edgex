@@ -23,7 +23,7 @@ def _today() -> str:
     return datetime.now(timezone.utc).date().isoformat()
 
 
-def _load_usage() -> dict:
+"""def _load_usage() -> dict:
     if not USAGE_FILE.exists():
         return {
             "date": _today(),
@@ -39,8 +39,37 @@ def _load_usage() -> dict:
             "analyses": 0
         }
 
-    return data
+    return data"""
 
+
+
+def _load_usage() -> dict:
+    default_usage = {
+        "date": _today(),
+        "analyses": 0
+    }
+
+    if not USAGE_FILE.exists():
+        return default_usage
+
+    try:
+        with open(
+            USAGE_FILE,
+            "r",
+            encoding="utf-8"
+        ) as f:
+            data = json.load(f)
+
+    except (
+        json.JSONDecodeError,
+        OSError
+    ):
+        return default_usage
+
+    if data.get("date") != _today():
+        return default_usage
+
+    return data
 
 def _save_usage(data: dict) -> None:
     USAGE_FILE.parent.mkdir(

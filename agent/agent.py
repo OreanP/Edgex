@@ -92,20 +92,66 @@ def analyse_market(market: Market) -> AgentAnalysis:
         )from e
 
     register_analysis()
+# =========================
+# DEFAULT FINAL VALUES
+# =========================
 
+    final_probability = forecast.probability
+    final_confidence = forecast.confidence
+    final_reasoning = forecast.reasoning
+    all_evidence = list(forecast.evidence)
+
+
+# =========================
+# CRITIC
+# =========================
 
     if ENABLE_CRITIC:
-        critic = critique_forecast(
-            market= market,
-            forecast=forecast
-        )
-    else:
-        critic_probability = forecast.probability
+        try:
+            critic = critique_forecast(
+                market=market,
+                forecast=forecast
+            )
 
-    edge = (critic.revised_probability - market.probability)
+            final_probability = critic.revised_probability
+            final_confidence = critic.confidence
+            final_reasoning = critic.reasoning
 
-    if abs(edge)<0.08:
-        decision= "SKIP"
+            all_evidence.extend(
+                critic.counter_evidence
+            )
+
+        except Exception as e:
+            print(
+                f"[WARNING] Critic failed: {e}"
+            )
+
+            final_reasoning = (
+                forecast.reasoning
+                + "\n\nCritic unavailable; "
+                + "initial forecast retained."
+            )
+
+
+    # =========================
+    # EDGE
+    # =========================
+
+    edge = (
+        final_probability
+        - market.probability
+    )
+
+
+    # =========================
+    # DECISION
+    # =========================
+
+    if final_confidence == "low":
+        decision = "SKIP"
+
+    elif abs(edge) < 0.001:
+        decision = "SKIP"
 
     elif edge > 0:
         decision = "BUY_YES"
@@ -113,15 +159,20 @@ def analyse_market(market: Market) -> AgentAnalysis:
     else:
         decision = "BUY_NO"
 
+
+    # =========================
+    # OUTPUT
+    # =========================
+
     return AgentAnalysis(
-        market_probability= market.probability,
-        initial_probability= forecast.probability,
-        final_probability= critic.revised_probability,
-        edge= edge,
-        confidence= critic.confidence, 
-        evidence= (forecast.evidence+ critic.counter_evidence),
-        decision= decision,
-        reasoning= critic.reasoning
+        market_probability=market.probability,
+        initial_probability=forecast.probability,
+        final_probability=final_probability,
+        edge=edge,
+        confidence=final_confidence,
+        evidence=all_evidence,
+        decision=decision,
+        reasoning=final_reasoning
     )
 
 class AgentError(Exception):
