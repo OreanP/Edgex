@@ -4,7 +4,7 @@ from agent.agent import analyse_market
 
 
 """market = Market(
-=======
+
 market = Market(
 >>>>>>> market-data
     id="test-002",
@@ -215,7 +215,7 @@ print("\nEvidence AGAINST:")
 
 for evidence in analysis.evidence:
     if not evidence.supports:
-<<<<<<< HEAD
+
         print("-", evidence.summary)"""
 
 print("-", evidence.summary)

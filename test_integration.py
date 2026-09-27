@@ -9,6 +9,11 @@ from agent.agent import (
     AgentError
 )
 
+<<<<<<< HEAD
+=======
+from agent.critic import (CriticResult)
+
+>>>>>>> main
 
 print(
     "Fetching Manifold markets..."

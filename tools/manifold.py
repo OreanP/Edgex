@@ -1,9 +1,8 @@
 import time
 import os
-import requests
 
 from dotenv import load_dotenv
-from agent.schemas import Market
+
 
 load_dotenv()
 
@@ -74,10 +73,18 @@ def scout_markets(markets, min_volume_24h=50):
 
     return candidates
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     markets = get_markets(limit=50, topic="ai")
 
     
+=======
+
+markets = get_markets(
+    limit=50,
+    topic="ai"
+)
+>>>>>>> main
 
 def to_market(manifold_market):
     return Market(

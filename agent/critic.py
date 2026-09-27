@@ -133,18 +133,14 @@ def critique_forecast(
             f"Critic OpenAI call failed: {e}"
         ) from e
 
-    if critic is None:
+    if result is None:
 
         raise RuntimeError(
             "Critic returned no structured result."
         )
 
 
-    if not (
-        0
-        <= critic.revised_probability
-        <= 1
-    ):
+    if not (0<= result.revised_probability<= 1):
 
         raise RuntimeError(
             "Critic returned an invalid probability"
