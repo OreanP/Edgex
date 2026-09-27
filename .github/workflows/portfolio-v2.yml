@@ -1,0 +1,29 @@
+name: Portfolio V2 offline tests
+on:
+  push:
+    branches: [feature/portfolio-v2-hackathon]
+  pull_request:
+    paths:
+      - 'portfolio/**'
+      - 'portfolio_app.py'
+      - 'tests/test_portfolio_*.py'
+      - 'requirements-portfolio.txt'
+      - '.github/workflows/portfolio-v2.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -r requirements-portfolio.txt
+      - run: python -m pytest -q tests/test_portfolio_v2.py tests/test_portfolio_ui.py tests/test_portfolio_showcase.py
+      - run: python -m compileall -q portfolio portfolio_app.py
+      - run: python -m portfolio.demo --out /tmp/edgex-demo.json
