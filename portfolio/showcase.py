@@ -148,8 +148,8 @@ def run_showcase(markets, researcher, source, *, policy=Policy(), store=None,
     research_deadline = deadline - preview_reserve
     analyses, options, errors, diagnostics, events = [], [], [], [], []
 
-    def emit(stage, mid='', status='STARTED', **extra):
-        row = dict(stage=stage, market_id=mid, status=status,
+    def emit(stage, market_id='', status='STARTED', **extra):
+        row = dict(stage=stage, market_id=market_id, status=status,
                    elapsed_seconds=round(time.monotonic()-start, 3), **extra)
         events.append(row)
         if progress:
