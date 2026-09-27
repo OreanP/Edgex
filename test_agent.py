@@ -1,7 +1,7 @@
 from agent.schemas import Market
 from agent.agent import analyse_market
 
-<<<<<<< HEAD
+
 
 """market = Market(
 =======
@@ -15,7 +15,7 @@ market = Market(
         "$150,000 on a recognized major exchange "
         "before December 31, 2026."
     )
-<<<<<<< HEAD
+
 )"""
 
 market = Market(
@@ -49,7 +49,7 @@ print("==============================")
 
 print(
     f"\nMarket probability:  "
-=======
+
 )
 
 analysis = analyse_market(market)
@@ -58,12 +58,12 @@ print("\n=== EDGEX ANALYSIS ===")
 
 print(
     f"Market probability: "
->>>>>>> market-data
+
     f"{analysis.market_probability:.1%}"
 )
 
 print(
-<<<<<<< HEAD
+
     f"Initial probability: "
     f"{analysis.initial_probability:.1%}"
 )
@@ -217,8 +217,8 @@ for evidence in analysis.evidence:
     if not evidence.supports:
 <<<<<<< HEAD
         print("-", evidence.summary)"""
-=======
-        print("-", evidence.summary)
+
+print("-", evidence.summary)
 
 print(
     f"Confidence: "
@@ -234,4 +234,4 @@ print(
     f"Reasoning: "
     f"{analysis.reasoning}"
 )
->>>>>>> market-data
+

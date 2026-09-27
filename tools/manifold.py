@@ -1,6 +1,4 @@
-import requests
-from agent.schemas import Market
-
+import time
 import os
 import requests
 
@@ -76,17 +74,22 @@ def scout_markets(markets, min_volume_24h=50):
 
     return candidates
 
-markets = get_markets(
-    limit=50,
-    topic="ai"
-)
+if __name__ == "__main__":
+    markets = get_markets(limit=50, topic="ai")
+
+    
 
 def to_market(manifold_market):
     return Market(
         id=manifold_market.get("id"),
         question=manifold_market.get("question"),
         probability=manifold_market.get("probability"),
-        description=manifold_market.get("description")
+        description=manifold_market.get("description"),
+        url=manifold_market.get("url"),
+        volume = manifold_market.get("volume24Hours"),
+        close_time=manifold_market.get("closeTime"),
+        fetched_at= time.time(),
+        token= manifold_market.get("token","MANA")
     )
 
 def get_me():
@@ -123,12 +126,16 @@ def place_bet(market_id, outcome, amount, dry_run=True):
 
     return response.json()
 
-result = place_bet(
-    market_id="A319ydGB1B7f4PMOROL3",
-    outcome="YES",
-    amount=1,
-    dry_run=True
-)
 
-print(result)
+if __name__ == "__main__":
+    markets = get_markets(limit=50, topic="ai")
+
+    result = place_bet(
+        market_id="A319ydGB1B7f4PMOROL3",
+        outcome="YES",
+        amount=1,
+        dry_run=True
+    )
+
+    print(result)
 
