@@ -2,10 +2,9 @@ import requests
 from agent.schemas import Market
 
 import os
-import requests
 
 from dotenv import load_dotenv
-from agent.schemas import Market
+
 
 load_dotenv()
 
@@ -75,6 +74,7 @@ def scout_markets(markets, min_volume_24h=50):
         candidates.append(market)
 
     return candidates
+
 
 markets = get_markets(
     limit=50,
