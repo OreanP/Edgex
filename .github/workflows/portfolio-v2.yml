@@ -24,6 +24,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install -r requirements-portfolio.txt
-      - run: python -m pytest -q tests/test_portfolio_v2.py tests/test_portfolio_ui.py
+      - run: python -m pytest -q tests/test_portfolio_v2.py tests/test_portfolio_ui.py tests/test_portfolio_showcase.py
       - run: python -m compileall -q portfolio portfolio_app.py
       - run: python -m portfolio.demo --out /tmp/edgex-demo.json
